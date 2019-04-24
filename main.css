@@ -31,3 +31,9 @@
     background: #007AFF;
     cursor: pointer;
 }
+body {
+  background-color: lightblue;
+}
+title {
+    background-color: darkblue;
+}
