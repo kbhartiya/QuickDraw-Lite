@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>QuickDraw-Lite</title>
+<title>QuickDraw-LITE</title>
 
 <!-- bs4 css -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"/>
@@ -18,9 +18,10 @@
 	
 </head>
 <body>
+<div id="loading"></div>
 <nav class="navbar navbar-expand-sm bg-light navbar-light">
   <!-- Brand/logo -->
-  <a class="navbar-brand" href="#"><h1>QuickDraw<small>-Lite</small></h1></a>
+  <a class="navbar-brand" href="#"><h1>QuickDraw<small>-LITE</small></h1></a>
   </nav>
 <div class="container-fluid"> 
 
@@ -351,6 +352,10 @@ $(function() {
 $(document).ready(function(){
     start('en');
 });
+	
+$(window).ready(hideLoader);
+// Strongly recommended: Hide loader after 20 seconds, even if the page hasn't finished loading
+setTimeout(hideLoader, 20 * 1000);
 </script>  
 </body>
 
