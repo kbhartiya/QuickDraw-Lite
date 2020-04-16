@@ -1,62 +1,32 @@
 <!--DOCTYPE html-->
 <html>
-<head>
-<meta charset="UTF-8" />
-<title>QuickDraw-LITE</title>
+    <head>
+        <meta charset="UTF-8" />
+        <title>QuickDraw-LITE</title>
 
-<!-- bs4 css -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"/>
-	
-<!-- css pie -->
-<link rel="stylesheet" href="pie.css"/>
+        <!-- css pie -->
+        <link rel="stylesheet" href="pie.css"/>
+        <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Shadows%20Into%20Light' rel='stylesheet'>
 
-<style>
-	img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-</style>
+        <!-- main stylesheet -->
+        <link rel="stylesheet" href="main.css"/> 
+    </head>
 
-
-<!-- main css -->
-<link rel="stylesheet" href="main.css"/> 
-	
-</head>
 <body>
-	
-<video autoplay muted loop id="myVideo">
-  <source src="raininglettersBW.mp4" type="video/mp4">
-</video>
-	
-<nav class="navbar navbar-expand-sm bg-light navbar-light">
-  <!-- Brand/logo -->
-  <a class="navbar-brand" href="#"><h1>QuickDraw<small>-LITE</small></h1></a>
-  </nav>
-<div class="container-fluid"> 
-
-<blockquote class="blockquote text-justify" style="margin:30px;">
- <p> QuickDraw-LITE is an implemenatation of Google QuickDraw that uses CNN to recognize various drawings. 
- The CNN was trained to recognize 150 <a href='https://github.com/kbhartiya/QuickDraw-Lite/blob/gh-pages/classes.txt'>classes</a> using the quick draw <a href='https://github.com/googlecreativelab/quickdraw-dataset'> dataset</a>. It will display the top five predictions for any drawing.
-	The original QuickDraw game is trained for <a href='https://github.com/googlecreativelab/quickdraw-dataset/blob/master/categories.txt'>345 classes </a>
-	 and the whole dataset can be found at <a href='https://console.cloud.google.com/storage/browser/quickdraw_dataset/full/numpy_bitmap'>QuickDraw dataset</a></p>
-    <footer class="blockquote-footer"><a href='https://kbhartiya.github.io/'>Kartik Bhartiya</a></footer>
-  </blockquote>
-<p style="text-align:center">Here's how it works</p>
-<img src="cnn.gif" alt="cnn" height="70%" width="50%">
-<h3>Rules of the Game:</h3>
- <ul>
-  <li>Draw something from the <a href='https://github.com/kbhartiya/QuickDraw-Lite/blob/gh-pages/classes.txt'>listed classes</a></li>
-  <li>See the top five predictions</li>
-  <li>Star <a href="https://github.com/kbhartiya/QuickDraw-Lite/">this repository</a> if you like it.</li>
-</ul> 
-<h4 style="text-align:center">Start Drawing!</h4>
+		
+<div class="header">
+  <h1 id="h-link"><a href="#">QuickDraw<small>-Lite</small></a></h1>
+  <h2 id="a-link"><a href="about.html">About</a></h2>
+  <h2 id="a-link"><a href="https://github.com/kbhartiya/QuickDraw-Lite">Github Repo</a></h2>
+  <h2 id="a-link"><a href="https://kbhartiya.github.io/portfolio-app/">About the author</a></h2>
 </div>
+
 
 <div class="row">
   <div class="col" style ='margin-left:100px;'>
-<h4 id='status' >Loading Model... </h4>	  
-<canvas id="canvas" width="300" height="300" class="canvas" style="border:1px solid #b9bfc9;margin-top:25px;"></canvas>
+<h4 style="text-align:center" id='status' >Loading Model... </h4>	  
+<canvas id="canvas" width="400" height="400" class="canvas" style="border:1px solid #b9bfc9;margin-top:25px;"></canvas>
 <div class="btn-group" style = 'margin-top:40px; '>
 <input type="range" min="5" max="20" value="10" class="slider" id="myRange" style ='margin-top:20px;'>
 <button type="button" class="btn btn-outline-primary" onclick ='erase()' style ='margin-left:10px;' disabled>Clear</button>
@@ -93,15 +63,6 @@
 </div>
 </div>
 
-<!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-<!-- Popper JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-
-<!-- Latest compiled JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
-
 <!-- TensorFlow.js script -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
 
@@ -109,271 +70,7 @@
 <script src="fabric.js"></script>
 <!-- main script -->
 <script src="pie.js"></script>
-<script>
-  console.log('starting'); 
-  var model;
-var canvas;
-var classNames = [];
-var canvas;
-var coords = [];
-var mousePressed = false;
-var mode;
-
-/*
-set the table of the predictions 
-*/
-function setTable(top5, probs) {
-    //loop over the predictions 
-    for (var i = 0; i < top5.length; i++) {
-        let sym = document.getElementById('sym' + (i + 1))
-        let prob = document.getElementById('prob' + (i + 1))
-        sym.innerHTML = top5[i]
-        prob.innerHTML = Math.round(probs[i] * 100)
-    }
-    //create the pie 
-    createPie(".pieID.legend", ".pieID.pie");
-
-}
-
-/*
-record the current drawing coordinates
-*/
-function recordCoor(event) {
-    var pointer = canvas.getPointer(event.e);
-    var posX = pointer.x;
-    var posY = pointer.y;
-
-    if (posX >= 0 && posY >= 0 && mousePressed) {
-        coords.push(pointer)
-    }
-}
-
-/*
-get the best bounding box by trimming around the drawing
-*/
-function getMinBox() {
-    //get coordinates 
-    var coorX = coords.map(function(p) {
-        return p.x
-    });
-    var coorY = coords.map(function(p) {
-        return p.y
-    });
-
-    //find top left and bottom right corners 
-    var min_coords = {
-        x: Math.min.apply(null, coorX),
-        y: Math.min.apply(null, coorY)
-    }
-    var max_coords = {
-        x: Math.max.apply(null, coorX),
-        y: Math.max.apply(null, coorY)
-    }
-
-    //return as strucut 
-    return {
-        min: min_coords,
-        max: max_coords
-    }
-}
-
-/*
-get the current image data 
-*/
-function getImageData() {
-        //get the minimum bounding box around the drawing 
-        const mbb = getMinBox()
-
-        //get image data according to dpi 
-        const dpi = window.devicePixelRatio
-        const imgData = canvas.contextContainer.getImageData(mbb.min.x * dpi, mbb.min.y * dpi,
-                                                      (mbb.max.x - mbb.min.x) * dpi, (mbb.max.y - mbb.min.y) * dpi);
-        return imgData
-    }
-
-/*
-get the prediction 
-*/
-function getFrame() {
-    //make sure we have at least two recorded coordinates 
-    if (coords.length >= 2) {
-
-        //get the image data from the canvas 
-        const imgData = getImageData()
-
-        //get the prediction 
-        const pred = model.predict(preprocess(imgData)).dataSync()
-
-        //find the top 5 predictions 
-        const indices = findIndicesOfMax(pred, 5)
-        const probs = findTopValues(pred, 5)
-        const names = getClassNames(indices)
-
-        //set the table 
-        setTable(names, probs)
-    }
-
-}
-
-/*
-get the the class names 
-*/
-function getClassNames(indices) {
-    var outp = []
-    for (var i = 0; i < indices.length; i++)
-        outp[i] = classNames[indices[i]]
-    return outp
-}
-
-/*
-load the class names 
-*/
-async function loadDict() {
-    if (mode == 'ar')
-        loc = 'model/class_names_ar.txt'
-    else
-        loc = 'model/class_names.txt'
-    
-    await $.ajax({
-        url: loc,
-        dataType: 'text',
-    }).done(success);
-}
-
-/*
-load the class names
-*/
-function success(data) {
-    const lst = data.split(/\n/)
-    for (var i = 0; i < lst.length - 1; i++) {
-        let symbol = lst[i]
-        classNames[i] = symbol
-    }
-}
-
-/*
-get indices of the top probs
-*/
-function findIndicesOfMax(inp, count) {
-    var outp = [];
-    for (var i = 0; i < inp.length; i++) {
-        outp.push(i); // add index to output array
-        if (outp.length > count) {
-            outp.sort(function(a, b) {
-                return inp[b] - inp[a];
-            }); // descending sort the output array
-            outp.pop(); // remove the last index (index of smallest element in output array)
-        }
-    }
-    return outp;
-}
-
-/*
-find the top 5 predictions
-*/
-function findTopValues(inp, count) {
-    var outp = [];
-    let indices = findIndicesOfMax(inp, count)
-    // show 5 greatest scores
-    for (var i = 0; i < indices.length; i++)
-        outp[i] = inp[indices[i]]
-    return outp
-}
-
-/*
-preprocess the data
-*/
-function preprocess(imgData) {
-    return tf.tidy(() => {
-        //convert to a tensor 
-        let tensor = tf.browser.fromPixels(imgData, numChannels = 1)
-        
-        //resize 
-        const resized = tf.image.resizeBilinear(tensor, [28, 28]).toFloat()
-        
-        //normalize 
-        const offset = tf.scalar(255.0);
-        const normalized = tf.scalar(1.0).sub(resized.div(offset));
-
-        //We add a dimension to get a batch shape 
-        const batched = normalized.expandDims(0)
-        return batched
-    })
-}
-
-/*
-load the model
-*/
-async function start(cur_mode) {
-    //arabic or english
-    mode = cur_mode
-    
-    //load the model 
-    model = await tf.loadLayersModel('model/model.json');
-    
-    //warm up 
-    model.predict(tf.zeros([1, 28, 28, 1]));
-    
-    //allow drawing on the canvas 
-    allowDrawing();
-    
-    //load the class names
-    await loadDict();
-}
-
-/*
-allow drawing on canvas
-*/
-function allowDrawing() {
-    canvas.isDrawingMode = 1;
-    if (mode == 'en')
-        document.getElementById('status').innerHTML = 'Model Loaded';
-    $('button').prop('disabled', false);
-    var slider = document.getElementById('myRange');
-    slider.oninput = function() {
-        canvas.freeDrawingBrush.width = this.value;
-    };
-}
-
-/*
-clear the canvs 
-*/
-function erase() {
-    canvas.clear();
-    canvas.backgroundColor = '#ffffff';
-    coords = [];
-}
-
-
-/*
-prepare the drawing canvas 
-*/
-$(function() {
-    canvas = window._canvas = new fabric.Canvas('canvas');
-    canvas.backgroundColor = '#ffffff';
-    canvas.isDrawingMode = 0;
-    canvas.freeDrawingBrush.color = "black";
-    canvas.freeDrawingBrush.width = 10;
-    canvas.renderAll();
-    //setup listeners 
-    canvas.on('mouse:up', function(e) {
-        getFrame();
-        mousePressed = false
-    });
-    canvas.on('mouse:down', function(e) {
-        mousePressed = true
-    });
-    canvas.on('mouse:move', function(e) {
-        recordCoor(e)
-    });
-});
-
-$(document).ready(function(){
-    start('en');
-});
-	
-
-</script>  
+<script src="main.js"></script>  
 </body>
 
 </html>

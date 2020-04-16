@@ -1,0 +1,142 @@
+<!--DOCTYPE html-->
+
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>QuickDraw-Lite | About</title>
+
+        <!-- css pie -->
+        <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Shadows%20Into%20Light' rel='stylesheet'>
+        <!-- main stylesheet -->
+        <link rel="stylesheet" href="main.css"/> 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  
+        <!-- Load Chart.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+        <script src="https://unpkg.com/chartjs-plugin-colorschemes@0.4.0/dist/chartjs-plugin-colorschemes.min.js"></script>
+
+        <!-- Load D3.js to read csv files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.min.js"></script>
+    </head>
+    <body>
+        <div class="header">
+            <h1 id="h-link"><a href="index.html">QuickDraw<small>-Lite</small></a></h1>
+            <h2 id="a-link"><a href="#">About</a></h2>
+            <h2 id="a-link"><a href="https://github.com/kbhartiya/QuickDraw-Lite">Github Repo</a></h2>
+            <h2 id="a-link"><a href="https://kbhartiya.github.io/postfolio-app/">About the author</a></h2>
+        </div>
+        <h3 class="blockquote text-justify" style="margin:30px;">
+         QuickDraw-LITE is an implemenatation of Google QuickDraw that uses a convolution Neural Network to recognize various hand drawings submitted. 
+            The CNN was trained to recognize 150 <a href='https://github.com/kbhartiya/QuickDraw-Lite/blob/gh-pages/classes.txt'>classes</a> using the quick draw <a href='https://github.com/googlecreativelab/quickdraw-dataset'> dataset</a>.
+            It will display the top five predictions for any drawing submitted by the user.
+            The original QuickDraw game is trained for <a href='https://github.com/googlecreativelab/quickdraw-dataset/blob/master/categories.txt'>345 classes </a>
+            and the whole dataset can be found at <a href='https://console.cloud.google.com/storage/browser/quickdraw_dataset/full/numpy_bitmap'>QuickDraw dataset</a>
+        </h3> 
+        <img src="./image.png" alt="cnn-image">
+        <div class="col">
+            <h2 style="font-weight: bolder;padding-bottom: 2vh;border-bottom: 2px solid #333;">Training Statistics</h2>
+            <h3>Top 5 categorical accuracy</h3>
+            <canvas id="accChart"></canvas>
+            <h3>Loss</h3>
+            <canvas id="lossChart"></canvas>
+        </div> 
+        <script>
+            var epochs = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,
+       17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+       34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48];
+            
+            var trainingAcc = [0.7453725 , 0.8630387 , 0.88104516, 0.8915751 , 0.89833945,
+       0.9025505 , 0.90637934, 0.9095569 , 0.9121895 , 0.9144941 ,
+       0.9163001 , 0.9175797 , 0.9199735 , 0.9205628 , 0.92208314,
+       0.9225599 , 0.92434406, 0.92485267, 0.92597425, 0.92663544,
+       0.9276459 , 0.9282986 , 0.9285175 , 0.92934144, 0.93013436,
+       0.93051267, 0.93087834, 0.93152446, 0.94157404, 0.9439699 ,
+       0.9454909 , 0.94635993, 0.9469292 , 0.9476355 , 0.94794554,
+       0.9487405 , 0.9490407 , 0.94937396, 0.949657  , 0.9503422 ,
+       0.9509063 , 0.950983  , 0.95177585, 0.9523737 , 0.95267916,
+       0.9527023 , 0.9527235 , 0.95300984, 0.95307595];
+       
+            var valAcc = [0.8712842 , 0.889688  , 0.9002046 , 0.90475875, 0.90746504,
+       0.9089424 , 0.91158384, 0.91245395, 0.912821  , 0.9138749 ,
+       0.9140631 , 0.9153757 , 0.91515684, 0.91541755, 0.9153467 ,
+       0.9156027 , 0.9158601 , 0.91571045, 0.9166117 , 0.9160394 ,
+       0.916428  , 0.9146911 , 0.9161444 , 0.91536045, 0.91556734,
+       0.9163895 , 0.91527575, 0.91578764, 0.91985434, 0.92023546,
+       0.92016137, 0.9202295 , 0.92019856, 0.920169  , 0.9201261 ,
+       0.92030483, 0.9200752 , 0.9203685 , 0.92046225, 0.920291  ,
+       0.92008424, 0.919981  , 0.9197649 , 0.92023075, 0.92007184,
+       0.9201429 , 0.92006433, 0.92006433, 0.9203497];
+      
+            var trainLoss = [2.1403424 , 1.44719566, 1.3008406 , 1.21634795, 1.16209629,
+       1.12085239, 1.0887417 , 1.06071242, 1.0373208 , 1.017379  ,
+       1.00200278, 0.98689387, 0.97319367, 0.96388221, 0.95201966,
+       0.94395236, 0.93337347, 0.92527023, 0.91803463, 0.91229887,
+       0.90340759, 0.89752377, 0.89235419, 0.88811494, 0.8817918 ,
+       0.8769918 , 0.87164845, 0.86788035, 0.76669281, 0.74158531,
+       0.72780402, 0.71966744, 0.71196372, 0.70599163, 0.70118033,
+       0.69600131, 0.69196859, 0.68743573, 0.6826346 , 0.67950722,
+       0.67569533, 0.67238899, 0.67026185, 0.65905853, 0.65704932,
+       0.65437266, 0.65354032, 0.65270832, 0.6522463];
+            
+            var valLoss = [1.3907938 , 1.22145436, 1.13718697, 1.09543826, 1.07056742,
+       1.05338536, 1.02458815, 1.02091199, 1.01420449, 1.00275213,
+       0.99716415, 0.9904329 , 0.98887332, 0.99555073, 0.98711526,
+       0.98630635, 0.98307926, 0.98424346, 0.97821731, 0.98753448,
+       0.98218981, 0.99279414, 0.98503768, 0.99010228, 0.98542546,
+       0.97863925, 0.98578901, 0.98979832, 0.95600588, 0.95524676,
+       0.95244048, 0.9539756 , 0.95482   , 0.95205745, 0.95405496,
+       0.95490865, 0.95461698, 0.95977201, 0.96064219, 0.95829265,
+       0.96033442, 0.96016224, 0.96297755, 0.9617176 , 0.96202931,
+       0.96217313, 0.96140822, 0.96197543, 0.96300614];
+
+            var ctx = document.getElementById("accChart");
+            var accChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels:epochs,
+                    datasets:[
+                        {
+                            data:trainingAcc,
+                            label:"Training",
+                            borderColor: "blue",
+                            backgroundColor: "rgba(0, 255, 255,0.5)",
+                            
+                        },
+                        {
+                            data:valAcc,
+                            label:"Validation",
+                            borderColor: "green",
+                            backgroundColor: "rgba(71, 209, 71, 0.9)",
+                            
+                        }
+                    ]
+                }
+            });
+            var ctx1 = document.getElementById("lossChart");
+            var lossChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels:epochs,
+                    datasets:[
+                        {
+                            data:trainLoss,
+                            label:"Training",
+                            borderColor: "blue",
+                            backgroundColor: "rgba(0, 255, 255,0.5)",
+                            
+                        },
+                        {
+                            data:valLoss,
+                            label:"Validation",
+                            borderColor: "green",
+                            backgroundColor: "rgba(71, 209, 71, 0.9)",
+                            
+                        }
+                    ]
+                }
+            });
+        </script>
+        
+    </body>
+</html>
