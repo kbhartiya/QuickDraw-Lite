@@ -1,6 +1,30 @@
+.clearbtn{
+  align-items: center;
+  justify-content: center;
+  margin-top: 2vh;
+  width: 20%;
+  height: 5vh;
+  font-family: 'Quicksand';
+  font-weight: 900;
+  color: #111;
+  background-color: white;
+  border-radius: 15%;
+  border: 1px solid #333;
+
+}
+
+.clearbtn:hover{
+  color: white;
+  background-color: #111;
+}
+
+.clearbtn:focus{
+  outline: none;
+}
+
 .slider {
     -webkit-appearance: none;
-    width: 220px;
+    width: 100%;
     height: 1px;
     border-radius: 50px;
     background: #d3d3d3;
@@ -9,6 +33,7 @@
     -webkit-transition: 1.2s;
     transition: opacity 1.0s;
 }
+
 
 .slider:hover {
     opacity: 5;
@@ -20,6 +45,7 @@
     width: 25px;
     height: 25px;
     border-radius: 100%;
+    border: 1px solid #111;
     background: #007AFF;
     cursor: pointer;
 }
@@ -126,9 +152,5 @@ img {
   width: 90%;
   height: 70vh;
   margin-bottom: 20vh;
-}
-
-.col {
-  /**/
 }
 

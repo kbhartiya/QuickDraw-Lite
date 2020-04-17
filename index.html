@@ -8,69 +8,79 @@
         <link rel="stylesheet" href="pie.css"/>
         <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
         <link href='https://fonts.googleapis.com/css?family=Shadows%20Into%20Light' rel='stylesheet'>
-
+        <!--
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.5.2/dist/tf.min.js"></script>
+        -->
         <!-- main stylesheet -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <link rel="stylesheet" href="main.css"/> 
+        <!-- TensorFlow.js script -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
+
+        <!-- canvas script -->
+        <script src="fabric.js"></script>
+        <!-- main script -->
+        <script src="pie.js"></script>
+        <script src="main.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script> 
     </head>
 
-<body>
-		
-<div class="header">
-  <h1 id="h-link"><a href="#">QuickDraw<small>-Lite</small></a></h1>
-  <h2 id="a-link"><a href="about.html">About</a></h2>
-  <h2 id="a-link"><a href="https://github.com/kbhartiya/QuickDraw-Lite">Github Repo</a></h2>
-  <h2 id="a-link"><a href="https://kbhartiya.github.io/portfolio-app/">About the author</a></h2>
-</div>
+    <body>
+        
+      <div class="header">
+        <h1 id="h-link"><a href="#">QuickDraw<small>-Lite</small></a></h1>
+        <h2 id="a-link"><a href="about.html">About</a></h2>
+        <h2 id="a-link"><a href="https://github.com/kbhartiya/QuickDraw-Lite">Github Repo</a></h2>
+        <h2 id="a-link"><a href="https://kbhartiya.github.io/portfolio-app/">About the author</a></h2>
+      </div>
 
 
-<div class="row">
-  <div class="col" style ='margin-left:100px;'>
-<h4 style="text-align:center" id='status' >Loading Model... </h4>	  
-<canvas id="canvas" width="400" height="400" class="canvas" style="border:1px solid #b9bfc9;margin-top:25px;"></canvas>
-<div class="btn-group" style = 'margin-top:40px; '>
-<input type="range" min="5" max="20" value="10" class="slider" id="myRange" style ='margin-top:20px;'>
-<button type="button" class="btn btn-outline-primary" onclick ='erase()' style ='margin-left:10px;' disabled>Clear</button>
-    </div>   
-</div>
-  <div class="col">
-    <section style="margin-top:120px">
-    <div class="pieID pie">
-      
-    </div>
-    <ul class="pieID legend">
-      <li>
-        <em id = "sym1"></em>
-        <span id = "prob1" ></span>
-      </li>
-      <li>
-        <em id = "sym2"></em>
-        <span id = "prob2"></span>
-      </li>
-      <li>
-        <em id = "sym3"></em>
-        <span id = "prob3"></span>
-      </li>
-      <li>
-        <em id = "sym4"></em>
-        <span id = "prob4"></span>
-      </li>
-      <li>
-        <em id = "sym5"></em>
-        <span id = "prob5"></span>
-      </li>
-    </ul>
-  </section>
-</div>
-</div>
+      <div class="row">
+        <div class="col" style ='margin-left:100px;'>
+      <h4 style="text-align:center" id='status' >Loading Model... </h4>	  
+      <canvas id="canvas" width="400" height="400" class="canvas" style="border:1px solid #b9bfc9;margin-top:25px;"></canvas>
+      <div class="btn-group" style = 'margin-top:40px; '>
+        <h4>Pencil Width:</h4>
+        <input type="range" min="5" max="20" value="10" class="slider" id="myRange" style ='margin-top:20px;'>
+        <button type="button" class="clearbtn" onclick ='erase()' disabled>Clear</button>
+      </div>   
+      </div>
+        <div class="col">
+          <section style="margin-top:120px">
+          <div class="pieID pie">
+            
+          </div>
+          <ul class="pieID legend">
+            <li>
+              <em id = "sym1"></em>
+              <span id = "prob1" ></span>
+            </li>
+            <li>
+              <em id = "sym2"></em>
+              <span id = "prob2"></span>
+            </li>
+            <li>
+              <em id = "sym3"></em>
+              <span id = "prob3"></span>
+            </li>
+            <li>
+              <em id = "sym4"></em>
+              <span id = "prob4"></span>
+            </li>
+            <li>
+              <em id = "sym5"></em>
+              <span id = "prob5"></span>
+            </li>
+          </ul>
+        </section>
+      </div>
+      </div>
 
-<!-- TensorFlow.js script -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"> </script>
-
-<!-- canvas script -->
-<script src="fabric.js"></script>
-<!-- main script -->
-<script src="pie.js"></script>
-<script src="main.js"></script>  
-</body>
+    </body>
+    <script>
+      console.log('starting');
+      start('en')
+      console.log('done');
+    </script>
 
 </html>
